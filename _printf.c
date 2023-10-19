@@ -6,30 +6,54 @@
  * Return: A total number of all printed chracters
  */
 int _printf(const char *format, ...)
-{int printed_chars;
-	conver_t f_list[] = {
-		{"c", print_char},
-		{"s", print_string},
-		{"%", print_percent},
-		{"d", print_integer},
-		{"i", print_integer},
-		{"b", print_binary},
-		{"r", print_reversed},
-		{"R", rot13},
-		{"u", unsigned_integer},
-		{"o", print_octal},
-		{"x", print_hex},
-		{"X", print_heX},
-		{NULL, NULL}
-	};
-	va_list arg_list;
-
+{int char_print =0;
 	if (format == NULL)
-		return (-1);
-
-	va_start(arg_list, format);
-	/*Calling parser function*/
-	printed_chars = parser(format, f_list, arg_list);
-	va_end(arg_list);
-	return (printed_chars);
+                return (-1);
+	 va_list arg_list;
+	 va_start(list_of_args, format);
+	 while(*format)
+	 {
+		 if (*format != '%')
+		 
+		{
+		write(1, format, 1);
+		chara_print++;
+	       	}
+		 else
+		 {
+			 format++;
+			 if(*format == '\0')
+				 break;
+			 if (*format == '%')
+			 {
+			 write(1, format, 1);
+			 chara_print++;
+			 }
+			 else if (*format == 'c')
+			 {
+			 char c = va_arg(list_of_args, int);
+			 write(1, &c, 1);
+			 chara_print++;
+			 }
+			 else if (*format == 's')
+			 {
+			 char *str = va_arg(list_of_args, char*);
+			 int str_len = 0;
+			 while(str[str_len] = '\0')
+				 str_len++;
+			 write(1, str, str_len);
+			 chara_print += str_len;
+			 }
+		 }
+		 format++;
+	 }
+	 va_end(list_of_args);
+	 return chara_print;
+}
+	int main(){
+		_printf("Elisha\n");
+		_printf("%c\n", 'v');
+		_printf("%s\n", "string")
+		_printf("%%\n");
+		return 0;
 }
