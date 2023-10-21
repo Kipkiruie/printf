@@ -1,59 +1,49 @@
-#include "main.h"
-/**
- * _printf receives the main string and all necessary parameters
- * to print formated output
- * @format: A string containing all necessary characters
- * Return: A total number of all printed chracters
- */
-int _printf(const char *format, ...)
-{int char_print =0;
-	if (format == NULL)
-                return (-1);
-	 va_list arg_list;
-	 va_start(list_of_args, format);
-	 while(*format)
-	 {
-		 if (*format != '%')
-		 
-		{
-		write(1, format, 1);
-		chara_print++;
-	       	}
-		 else
-		 {
-			 format++;
-			 if(*format == '\0')
-				 break;
-			 if (*format == '%')
-			 {
-			 write(1, format, 1);
-			 chara_print++;
-			 }
-			 else if (*format == 'c')
-			 {
-			 char c = va_arg(list_of_args, int);
-			 write(1, &c, 1);
-			 chara_print++;
-			 }
-			 else if (*format == 's')
-			 {
-			 char *str = va_arg(list_of_args, char*);
-			 int str_len = 0;
-			 while(str[str_len] = '\0')
-				 str_len++;
-			 write(1, str, str_len);
-			 chara_print += str_len;
-			 }
-		 }
-		 format++;
-	 }
-	 va_end(list_of_args);
-	 return chara_print;
+#include <stio.h>
+#include <stdarg.h>
+
+int _printf(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    int count = 0; // Initialize the character count
+
+    while (*format) {
+        if (*format != '%') {
+            putchar(*format);
+            count++;
+        } else {
+            format++; // Move past the '%'
+            if (*format == 'c') {
+                // Handle the 'c' specifier
+                int c = va_arg(args, int);
+                putchar(c);
+                count++;
+            } else if (*format == 's') {
+                // Handle the 's' specifier
+                char *s = va_arg(args, char *);
+                while (*s) {
+                    putchar(*s);
+                    s++;
+                    count++;
+                }
+            } else if (*format == '%') {
+                // Handle the '%%' specifier
+                putchar('%');
+                count++;
+            }
+        }
+        format++;
+    }
+
+    va_end(args);
+    return count;
 }
-	int main(){
-		_printf("Elisha\n");
-		_printf("%c\n", 'v');
-		_printf("%s\n", "string")
-		_printf("%%\n");
-		return 0;
+
+int main() {
+    char str[] = "Hello, World!";
+    int count = _printf("Printing a character: %c\n", 'A');
+    count += _printf("Printing a string: %s\n", str);
+    count += _printf("Printing a percent sign: %%\n");
+    printf("Total characters printed: %d\n", count);
+    return 0;
 }
