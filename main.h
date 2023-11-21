@@ -1,40 +1,72 @@
-#ifndef _MAIN_H
-#define _MAIN_H
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-/**
- * struct fn - Struct fn
- * @ob: The operator
- * @type: The function associated
-*/
-typedef struct fn
-{
-	char *ob;
-	int (*type)(va_list var);
-} fn_t;
+#ifndef _MAIN_H_
+#define _MAIN_H_
 
-int _putchar(char *c);
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+#define UNUSED(x) (void)(x)
+#define BUFFER 1024
+
 int _printf(const char *format, ...);
-int _printarg(char *c);
-char *change_base(unsigned int num, int base);
-int p_char(va_list args);
-int p_string(va_list args);
-int p_percent(va_list args __attribute__((unused)));
-int p_int(va_list args);
-int p_bin(va_list args);
-int p_rev(va_list args);
-char *_strcpy(char *dest, const char *str);
+
+
+/**
+* struct FormatSettings - handles Formatsettings
+* @flags: I will add description
+* @width: Remember to add description
+* @precision: remember to add desc
+*/
+struct FormatSettings
+{
+	int flags;
+	int width;
+	int precision;
+
+};
+
+/**
+* struct format_specifier_struct - associates format specifiers with handlers
+* @specifier: character representing specific format specifier
+* @handler: pointer to function that handles specified format
+*/
+struct format_specifier_struct
+{
+	char specifier;  /* c, s, d, i... */
+	int (*handler)(va_list args, struct FormatSettings *formatsettings);
+};
+
+extern struct FormatSettings formatSettings;
+typedef struct format_specifier_struct format_specifier;
+
+int handle_char(va_list args, struct FormatSettings *formatSettings);
+int handle_string(va_list args, struct FormatSettings *formatSettings);
+int handle_percent(va_list args, struct FormatSettings *formatSettings);
+int handle_int(va_list args, struct FormatSettings *formatSettings);
+int handle_unsigned(va_list args, struct FormatSettings *formatSettings);
+
+int handle_binary(va_list args, struct FormatSettings *formatSettings);
+int handle_octal(va_list args, struct FormatSettings *formatSettings);
+int handle_hex_lower(va_list args, struct FormatSettings *formatSettings);
+int handle_hex_upper(va_list args, struct FormatSettings *formatSettings);
+int handle_custom_string(va_list args, struct FormatSettings *formatSettings);
+int handle_pointer(va_list args, struct FormatSettings *formatSettings);
+int handle_rot13(va_list args, struct FormatSettings *formatSettings);
+int handle_reverse(va_list args, struct FormatSettings *formatSettings);
+
+int parse_format_flags(const char *format, int *index);
+int parse_format_width(const char *format, int *index, va_list list);
+int parse_format_precision(const char *format, int *index, va_list list);
+
+int apform(char *buffer, int buffer_len,
+	   struct FormatSettings *formatSettings);
+
 int _strlen(char *s);
-int *print_formats(int i, char *copyfmt, va_list args);
-int p_unsigned(va_list args);
-int p_octal(va_list args);
-int p_hex_upper(va_list args);
-int p_hex_low(va_list args);
-char *change_hex_low(unsigned int num, int base);
-int p_string_esp(va_list args);
-char *replace_str(char *s);
-int p_add(va_list args);
-char *rot13(char *n);
-int p_rot13(va_list args);
-#endif
+void _itoa(int value, char *output);
+int _putchar(char c);
+int is_digit(char c);
+
+#endif /*_MAIN_H_*/

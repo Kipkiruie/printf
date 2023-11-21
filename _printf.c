@@ -1,49 +1,84 @@
-#include <stio.h>
-#include <stdarg.h>
+#include "main.h"
 
-int _printf(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
+/**
+* printhand - handles format specifiers and prints formatted output
+* @format: formatted input string containing specifiers
+* @iter: list of specifier characters to iterate over (va_list)
+* Return: number of characters printed successfully
+*/
+int printhand(const char *format, va_list iter)
+{
+	int i = 0, counter = 0;
+	struct FormatSettings formatSettings;
 
-    int count = 0; // Initialize the character count
+	format_specifier specifiers[] = {
+		{'c', handle_char},
+		{'s', handle_string},
+		{'%', handle_percent},
+		{'d', handle_int},
+		{'i', handle_int},
+		{'u', handle_unsigned},
+		{'b', handle_binary},
+		{'o', handle_octal},
+		{'x', handle_hex_lower},
+		{'X', handle_hex_upper},
+		{'S', handle_custom_string},
+		{'p', handle_pointer},
+		{'R', handle_rot13},
+		{'r', handle_reverse},
+		{'\0', NULL},
+		/* add more specifiers */
+	};
 
-    while (*format) {
-        if (*format != '%') {
-            putchar(*format);
-            count++;
-        } else {
-            format++; // Move past the '%'
-            if (*format == 'c') {
-                // Handle the 'c' specifier
-                int c = va_arg(args, int);
-                putchar(c);
-                count++;
-            } else if (*format == 's') {
-                // Handle the 's' specifier
-                char *s = va_arg(args, char *);
-                while (*s) {
-                    putchar(*s);
-                    s++;
-                    count++;
-                }
-            } else if (*format == '%') {
-                // Handle the '%%' specifier
-                putchar('%');
-                count++;
-            }
-        }
-        format++;
-    }
 
-    va_end(args);
-    return count;
+	formatSettings.flags = parse_format_flags(format, &i);
+	formatSettings.width = parse_format_width(format, &i, iter);
+	formatSettings.precision = parse_format_precision(format, &i, iter);
+
+	for (i = 0; specifiers[i].specifier != '\0'; i++)
+	{
+		if (*format == specifiers[i].specifier)
+		{
+			counter += (specifiers[i].handler(iter, &formatSettings));
+			break;
+		}
+	}
+
+	if (specifiers[i].specifier == '\0')
+		return (-1);
+
+	return (counter);
 }
 
-int main() {
-    char str[] = "Hello, World!";
-    int count = _printf("Printing a character: %c\n", 'A');
-    count += _printf("Printing a string: %s\n", str);
-    count += _printf("Printing a percent sign: %%\n");
-    printf("Total characters printed: %d\n", count);
-    return 0;
+/**
+* _printf - custom printf implementation for formatted output
+* @format: formatted string containing specifiers
+* Return: number of characters printed successfully. returns -1 on error
+*/
+int _printf(const char *format, ...)
+{
+	unsigned int count = 0, prem_count;
+	va_list args;
+
+	va_start(args, format);
+
+	if (format == NULL)
+		return (-1);
+
+	while (*format)
+	{
+		if (*format == '%')
+		{
+			format++;
+			prem_count = printhand(format, args);
+
+			count += prem_count;
+		}
+		else
+			count += write(1, format, 1);
+		format++;
+	}
+
+	va_end(args);
+	return (count);
 }
